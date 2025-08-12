@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Girish Lade - Portfolio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-light: #f8fafc;
+            --text-light: #0f172a;
+            --card-light: #ffffff;
+            --border-light: #e2e8f0;
+            --primary-color: #0ea5e9;
+            --primary-hover: #0284c7;
+            --bg-dark: #0f172a;
+            --text-dark: #f8fafc;
+            --card-dark: #1e293b;
+            --border-dark: #334155;
+        }
+
+        .dark {
+            --bg-light: var(--bg-dark);
+            --text-light: var(--text-dark);
+            --card-light: var(--card-dark);
+            --border-light: var(--border-dark);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-light);
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--border-light);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-hover);
+        }
+
+        /* Preloader */
+        #preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-light);
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.5s ease-out;
+        }
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border-left-color: var(--primary-color);
+            animation: spin 1s ease-in-out infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animated {
+            opacity: 0;
+        }
+        .animated.visible {
+            animation: slideUp 0.8s ease-out forwards;
+        }
+
+        /* Header */
+        #header {
+            background-color: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(10px);
+            border-bottom-color: var(--border-light);
+            transition: background-color 0.3s, box-shadow 0.3s;
+        }
+        .dark #header {
+             background-color: rgba(15, 23, 42, 0.5);
+        }
+        #header.scrolled {
+            background-color: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .dark #header.scrolled {
+            background-color: rgba(30, 41, 59, 0.95);
+        }
+
+        /* Navigation Links */
+        .nav-link {
+            position: relative;
+            transition: color 0.3s;
+        }
+        .nav-link.active::after, .nav-link:hover::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background-color: var(--primary-color);
+            bottom: -4px;
+            left: 0;
+            transform: scaleX(1);
+            transform-origin: bottom left;
+            transition: transform 0.3s ease-out;
+        }
+        .nav-link:not(.active):hover::after {
+            transform: scaleX(1);
+            transform-origin: bottom left;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background-color: var(--primary-color);
+            bottom: -4px;
+            left: 0;
+            transform: scaleX(0);
+            transform-origin: bottom right;
+            transition: transform 0.3s ease-out;
+        }
+        .section {
+            display: none;
+            border-bottom: 1px solid var(--border-light);
+        }
+        .section:last-child {
+            border-bottom: none;
+        }
+        .section.active {
+            display: block;
+        }
+        .project-card {
+            transition: transform 0.3s, box-shadow 0.3s;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+            background-color: var(--card-light);
+            border-color: var(--border-light);
+        }
+        .project-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(14, 165, 233, 0.15);
+        }
+        .project-card .p-6 {
+            flex-grow: 1;
+        }
+        .project-card .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(14, 165, 233, 0.9);
+            color: white;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 1rem;
+        }
+        .project-card:hover .overlay {
+            opacity: 1;
+        }
+        .overlay-content {
+            transform: translateY(20px);
+            transition: transform 0.4s ease;
+        }
+        .project-card:hover .overlay-content {
+            transform: translateY(0);
+        }
+        .feature-card {
+            transition: all 0.3s ease;
+            background-color: var(--card-light);
+            border-color: var(--border-light);
+        }
+        .feature-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+            border-color: var(--primary-color);
+        }
+        .cta-button {
+            transition: all 0.3s ease;
+        }
+        .cta-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(14, 165, 233, 0.3);
+        }
+        
+        #scrollToTopBtn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s, transform 0.3s;
+            z-index: 100;
+        }
+        #scrollToTopBtn.show {
+            display: flex;
+            opacity: 1;
+        }
+        #scrollToTopBtn:hover {
+            background-color: var(--primary-hover);
+            transform: scale(1.1);
+        }
+        .skill-tag {
+            background-color: #e0f2fe;
+            color: #0c4a6e;
+            transition: all 0.2s ease-in-out;
+        }
+        .dark .skill-tag {
+            background-color: #38bdf8;
+            color: #075985;
+        }
+        .skill-tag:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body class="antialiased">
+    
+    <div id="preloader">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Header -->
+    <header id="header" class="sticky top-0 z-50 transition-all duration-300">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Logo -->
+                <div class="flex-shrink-0">
+                    <a href="#home" class="text-2xl font-bold hover:text-sky-500 transition-colors page-link">Girish Lade</a>
+                </div>
+
+                <!-- Desktop Navigation -->
+                <nav class="hidden md:flex md:items-center md:space-x-8">
+                    <a href="#home" class="nav-link page-link active">Home</a>
+                    <a href="#about" class="nav-link page-link">About</a>
+                    <a href="#projects" class="nav-link page-link">Projects</a>
+                    <a href="#contact" class="nav-link page-link">Contact</a>
+                </nav>
+                
+                <!-- Theme Toggle -->
+                <div class="flex items-center">
+                    <button id="theme-toggle" class="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+                        <svg id="theme-toggle-dark-icon" class="w-5 h-5 hidden" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+                        <svg id="theme-toggle-light-icon" class="w-5 h-5 hidden" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 5.05A1 1 0 003.636 6.464l.707.707a1 1 0 001.414-1.414l-.707-.707zM3 11a1 1 0 100-2H2a1 1 0 100 2h1zm7.536 2.464a1 1 0 01-1.414 0l-.707-.707a1 1 0 011.414-1.414l.707.707a1 1 0 010 1.414z"></path></svg>
+                    </button>
+                    <!-- Mobile Menu Button -->
+                    <div class="md:hidden ml-2">
+                        <button id="mobile-menu-button" class="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 focus:outline-none">
+                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-[var(--card-light)]">
+            <nav class="px-2 pt-2 pb-4 space-y-1 sm:px-3">
+                <a href="#home" class="block px-3 py-2 rounded-md text-base font-medium hover:bg-slate-200 dark:hover:bg-slate-700 page-link">Home</a>
+                <a href="#about" class="block px-3 py-2 rounded-md text-base font-medium hover:bg-slate-200 dark:hover:bg-slate-700 page-link">About</a>
+                <a href="#projects" class="block px-3 py-2 rounded-md text-base font-medium hover:bg-slate-200 dark:hover:bg-slate-700 page-link">Projects</a>
+                <a href="#contact" class="block px-3 py-2 rounded-md text-base font-medium hover:bg-slate-200 dark:hover:bg-slate-700 page-link">Contact</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <!-- Sections will be injected here by JS -->
+    </main>
+    
+    <button id="scrollToTopBtn" title="Go to top">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+        </svg>
+    </button>
+
+    <!-- Footer -->
+    <footer class="bg-[var(--card-light)] border-t border-[var(--border-light)]">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-6 text-center">
+            <p>&copy; 2024 Girish Lade. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const mainContent = document.querySelector('main');
+            
+            // --- Content for Pages ---
+            const pages = {
+                home: `
+                    <section id="home" class="section active">
+                        <!-- Hero Section -->
+                        <div class="min-h-[90vh] flex items-center">
+                            <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                                <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight animated" style="animation-delay: 0.2s;">
+                                    Building Smart, Beautiful &<br class="hidden sm:block">
+                                    <span class="text-[var(--primary-color)]">Powerful Digital Experiences</span>
+                                </h1>
+                                <p class="mt-6 max-w-3xl mx-auto text-lg animated" style="animation-delay: 0.4s;">
+                                    I’m Girish Lade – a Web Developer, UI/UX Designer, Data Scientist, and AI Tools Creator. I design & develop modern, fast, and AI-powered digital products for the future.
+                                </p>
+                                <div class="mt-8 flex justify-center gap-4 animated" style="animation-delay: 0.6s;">
+                                    <a href="#projects" class="page-link cta-button bg-[var(--primary-color)] text-white font-semibold px-8 py-3 rounded-lg hover:bg-[var(--primary-hover)] transition-all shadow-md">
+                                        View My Work
+                                    </a>
+                                    <a href="#contact" class="page-link cta-button bg-[var(--card-light)] font-semibold px-8 py-3 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-all border border-[var(--border-light)]">
+                                        Contact Me
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- About Preview -->
+                        <div class="py-16 sm:py-24 bg-[var(--card-light)]">
+                            <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl text-center animated">
+                                <p class="text-xl leading-relaxed">With expertise in Web Development, UI/UX Design, AI Tools, and Data Science, I create products that are both functional and visually stunning. From responsive websites to AI-powered platforms, I craft solutions that help brands, businesses, and individuals stand out in the digital world.</p>
+                                <a href="#about" class="page-link mt-6 inline-block font-semibold text-[var(--primary-color)] hover:text-[var(--primary-hover)]">Read More &rarr;</a>
+                            </div>
+                        </div>
+
+                        <!-- Featured Skills -->
+                        <div class="py-16 sm:py-24">
+                            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                                <div class="text-center mb-12 animated">
+                                    <h2 class="text-3xl sm:text-4xl font-bold">I Can Help You With</h2>
+                                </div>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                                    <div class="feature-card p-8 rounded-xl border text-center animated"><h3 class="text-xl font-bold">Website Development</h3><p class="mt-2">Fast, SEO-friendly, responsive websites.</p></div>
+                                    <div class="feature-card p-8 rounded-xl border text-center animated" style="animation-delay: 0.1s;"><h3 class="text-xl font-bold">UI/UX Design</h3><p class="mt-2">Minimal, modern, and user-focused designs.</p></div>
+                                    <div class="feature-card p-8 rounded-xl border text-center animated" style="animation-delay: 0.2s;"><h3 class="text-xl font-bold">AI Tool Development</h3><p class="mt-2">Custom AI-integrated solutions.</p></div>
+                                    <div class="feature-card p-8 rounded-xl border text-center animated" style="animation-delay: 0.3s;"><h3 class="text-xl font-bold">SaaS Products</h3><p class="mt-2">API-based, scalable applications.</p></div>
+                                    <div class="feature-card p-8 rounded-xl border text-center animated" style="animation-delay: 0.4s;"><h3 class="text-xl font-bold">Data Analysis & Visualization</h3><p class="mt-2">Turning data into insights.</p></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Featured Projects Preview -->
+                        <div class="py-16 sm:py-24 bg-[var(--card-light)]">
+                            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                                <div class="text-center mb-12 animated">
+                                    <h2 class="text-3xl sm:text-4xl font-bold">Some of My Recent Work</h2>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                                    <div class="bg-slate-100 dark:bg-slate-800 p-6 rounded-lg text-center animated"><strong>AI Website Builder:</strong> Generate websites with AI in seconds.</div>
+                                    <div class="bg-slate-100 dark:bg-slate-800 p-6 rounded-lg text-center animated" style="animation-delay: 0.1s;"><strong>Google Drive Clone:</strong> Supabase-powered file storage & sharing app.</div>
+                                    <div class="bg-slate-100 dark:bg-slate-800 p-6 rounded-lg text-center animated" style="animation-delay: 0.2s;"><strong>World Radio Webapp:</strong> Stream radio stations from around the world.</div>
+                                    <div class="bg-slate-100 dark:bg-slate-800 p-6 rounded-lg text-center animated" style="animation-delay: 0.3s;"><strong>API Testing Tool:</strong> Online Postman alternative for developers.</div>
+                                </div>
+                                <div class="text-center mt-12 animated">
+                                    <a href="#projects" class="page-link cta-button bg-[var(--primary-color)] text-white font-semibold px-8 py-3 rounded-lg hover:bg-[var(--primary-hover)] transition-all shadow-md">
+                                        View All Projects &rarr;
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Call to Collaboration -->
+                        <div class="py-16 sm:py-24">
+                            <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-3xl text-center animated">
+                                <h2 class="text-3xl sm:text-4xl font-bold">Let’s build something amazing together.</h2>
+                                <p class="mt-4 text-lg">Whether it’s a startup idea, a portfolio website, or a full-scale SaaS product – I’m ready to bring it to life.</p>
+                                <div class="mt-8">
+                                     <a href="#contact" class="page-link cta-button inline-block bg-[var(--primary-color)] text-white font-semibold text-lg px-8 py-4 rounded-lg hover:bg-[var(--primary-hover)] transition-all shadow-md">
+                                        Get In Touch
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                `,
+                about: `
+                    <section id="about" class="section py-16 sm:py-24">
+                        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                            <div class="max-w-4xl mx-auto">
+                                <div class="text-center mb-12 animated">
+                                    <h2 class="text-3xl sm:text-4xl font-bold">About Me</h2>
+                                    <p class="mt-4 text-lg">A little bit about my journey and what I do.</p>
+                                </div>
+                                <div class="bg-[var(--card-light)] p-8 sm:p-12 rounded-2xl shadow-sm border border-[var(--border-light)] animated">
+                                    
+                                    <h3 class="text-2xl font-bold">Who I Am</h3>
+                                    <p class="mt-4 leading-relaxed">
+                                        I’m Girish Lade — a multi-disciplinary Programmer, Web Developer, UI/UX Designer, Data Scientist, and AI Tools Creator. With a strong passion for building innovative digital solutions, I combine creative design with technical expertise to deliver products that are not just functional, but also visually stunning and user-friendly.
+                                    </p>
+                                    <hr class="my-8 border-[var(--border-light)]">
+
+                                    <h3 class="text-2xl font-bold">What I Do</h3>
+                                    <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div class="bg-slate-100 dark:bg-slate-800 p-4 rounded-lg"><strong>Web Development:</strong> Building fast, responsive, and SEO-friendly websites.</div>
+                                        <div class="bg-slate-100 dark:bg-slate-800 p-4 rounded-lg"><strong>UI/UX Design:</strong> Designing minimalistic, engaging interfaces.</div>
+                                        <div class="bg-slate-100 dark:bg-slate-800 p-4 rounded-lg"><strong>AI Tools Development:</strong> Creating AI-integrated applications.</div>
+                                        <div class="bg-slate-100 dark:bg-slate-800 p-4 rounded-lg"><strong>Mobile App Development:</strong> Developing performant Android applications.</div>
+                                        <div class="bg-slate-100 dark:bg-slate-800 p-4 rounded-lg"><strong>Data Science:</strong> Turning data into actionable insights.</div>
+                                        <div class="bg-slate-100 dark:bg-slate-800 p-4 rounded-lg"><strong>Brand & Product Strategy:</strong> Helping brands create impactful digital identities.</div>
+                                    </div>
+                                    <hr class="my-8 border-[var(--border-light)]">
+
+                                    <h3 class="text-2xl font-bold">Skills & Technologies</h3>
+                                    <div class="mt-4 space-y-4">
+                                        <div>
+                                            <h4 class="font-semibold">Languages & Frameworks:</h4>
+                                            <div class="flex flex-wrap gap-2 mt-2">
+                                                <span class="skill-tag text-sm font-medium px-3 py-1 rounded-full">HTML</span>
+                                                <span class="skill-tag text-sm font-medium px-3 py-1 rounded-full">CSS</span>
+                                                <span class="skill-tag text-sm font-medium px-3 py-1 rounded-full">JavaScript</span>
+                                                <span class="skill-tag text-sm font-medium px-3 py-1 rounded-full">TypeScript</span>
+                                                <span class="skill-tag text-sm font-medium px-3 py-1 rounded-full">Python</span>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <h4 class="font-semibold">Databases & Backend:</h4>
+                                            <div class="flex flex-wrap gap-2 mt-2">
+                                                <span class="skill-tag text-sm font-medium px-3 py-1 rounded-full">Supabase</span>
+                                                <span class="skill-tag text-sm font-medium px-3 py-1 rounded-full">Firebase</span>
+                                                <span class="skill-tag text-sm font-medium px-3 py-1 rounded-full">Airtable</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <hr class="my-8 border-[var(--border-light)]">
+
+                                    <h3 class="text-2xl font-bold">My Vision</h3>
+                                    <p class="mt-4 leading-relaxed">To build smart, accessible, and impactful digital products that make technology work for everyone — from small businesses to large enterprises. I aim to integrate AI into everyday tools so they’re smarter, faster, and more intuitive.</p>
+                                    <hr class="my-8 border-[var(--border-light)]">
+                                    
+                                    <h3 class="text-2xl font-bold">My Journey</h3>
+                                    <p class="mt-4 leading-relaxed">From experimenting with basic HTML to developing AI-powered platforms, my journey has been fueled by curiosity and a love for solving problems. Over the years, I’ve worked on:</p>
+                                    <ul class="list-disc list-inside mt-4 space-y-2">
+                                        <li>AI-powered website builder like bolt.new and lovable.dev</li>
+                                        <li>Google Drive-like file management platform using Supabase</li>
+                                        <li>World Radio Webapp with live streaming</li>
+                                        <li>API testing & documentation tools for developers</li>
+                                    </ul>
+                                    <hr class="my-8 border-[var(--border-light)]">
+
+                                    <h3 class="text-2xl font-bold">Beyond Work</h3>
+                                    <p class="mt-4 leading-relaxed">When I’m not coding, I’m probably:</p>
+                                    <ul class="list-disc list-inside mt-4 space-y-2">
+                                        <li>Exploring the latest tech news & global trends</li>
+                                        <li>Working on side projects and AI experiments</li>
+                                        <li>Designing new UI concepts</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                `,
+                projects: `
+                    <section id="projects" class="section py-16 sm:py-24">
+                        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                            <div class="text-center mb-12 animated">
+                                <h2 class="text-3xl sm:text-4xl font-bold">My Work</h2>
+                                <p class="mt-4 text-lg">A selection of projects I'm proud of.</p>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                                <a href="https://github.com/girishlade111/AI-Website-Builder" target="_blank" class="project-card rounded-xl overflow-hidden shadow-sm animated">
+                                    <img src="https://placehold.co/600x400/0ea5e9/ffffff?text=AI+Website+Builder" alt="AI Website Builder" class="w-full h-48 object-cover">
+                                    <div class="p-6"><h3 class="text-xl font-bold">AI Website Builder</h3><p class="mt-2">Generate websites with AI in seconds.</p></div>
+                                    <div class="overlay"><div class="overlay-content"><h3 class="text-xl font-bold">AI Website Builder</h3><p class="mt-2 text-sm">Click to view on GitHub</p></div></div>
+                                </a>
+                                <a href="https://github.com/girishlade111/File-Management-System" target="_blank" class="project-card rounded-xl overflow-hidden shadow-sm animated" style="animation-delay: 0.1s;">
+                                    <img src="https://placehold.co/600x400/34d399/ffffff?text=File+Manager" alt="File Management System" class="w-full h-48 object-cover">
+                                    <div class="p-6"><h3 class="text-xl font-bold">File Management System</h3><p class="mt-2">A secure, Google Drive-like file management platform.</p></div>
+                                    <div class="overlay"><div class="overlay-content"><h3 class="text-xl font-bold">File Management System</h3><p class="mt-2 text-sm">Click to view on GitHub</p></div></div>
+                                </a>
+                                <a href="https://github.com/girishlade111/World-Radio-WebApp" target="_blank" class="project-card rounded-xl overflow-hidden shadow-sm animated" style="animation-delay: 0.2s;">
+                                    <img src="https://placehold.co/600x400/f59e0b/ffffff?text=World+Radio" alt="World Radio WebApp" class="w-full h-48 object-cover">
+                                    <div class="p-6"><h3 class="text-xl font-bold">World Radio Webapp</h3><p class="mt-2">Stream live radio stations from around the globe.</p></div>
+                                    <div class="overlay"><div class="overlay-content"><h3 class="text-xl font-bold">World Radio Webapp</h3><p class="mt-2 text-sm">Click to view on GitHub</p></div></div>
+                                </a>
+                                 <a href="https://github.com/girishlade111/API-Testing-Tool" target="_blank" class="project-card rounded-xl overflow-hidden shadow-sm animated" style="animation-delay: 0.3s;">
+                                    <img src="https://placehold.co/600x400/8b5cf6/ffffff?text=API+Tester" alt="API Testing Tool" class="w-full h-48 object-cover">
+                                    <div class="p-6"><h3 class="text-xl font-bold">API Testing Tool</h3><p class="mt-2">Online Postman alternative for developers.</p></div>
+                                    <div class="overlay"><div class="overlay-content"><h3 class="text-xl font-bold">API Testing Tool</h3><p class="mt-2 text-sm">Click to view on GitHub</p></div></div>
+                                </a>
+                                 <a href="https://github.com/girishlade111/Multi-LLM-Chatbot" target="_blank" class="project-card rounded-xl overflow-hidden shadow-sm animated" style="animation-delay: 0.4s;">
+                                    <img src="https://placehold.co/600x400/ec4899/ffffff?text=Multi-LLM+Chat" alt="Multi-LLM Chatbot" class="w-full h-48 object-cover">
+                                    <div class="p-6"><h3 class="text-xl font-bold">Multi-LLM Chatbot</h3><p class="mt-2">Integrates multiple Large Language Models.</p></div>
+                                    <div class="overlay"><div class="overlay-content"><h3 class="text-xl font-bold">Multi-LLM Chatbot</h3><p class="mt-2 text-sm">Click to view on GitHub</p></div></div>
+                                </a>
+                                 <a href="https://github.com/girishlade111/Portfolio-Website" target="_blank" class="project-card rounded-xl overflow-hidden shadow-sm animated" style="animation-delay: 0.5s;">
+                                    <img src="https://placehold.co/600x400/10b981/ffffff?text=Portfolio" alt="Portfolio Website" class="w-full h-48 object-cover">
+                                    <div class="p-6"><h3 class="text-xl font-bold">This Portfolio</h3><p class="mt-2">The source code for the website you're on right now.</p></div>
+                                    <div class="overlay"><div class="overlay-content"><h3 class="text-xl font-bold">This Portfolio</h3><p class="mt-2 text-sm">Click to view on GitHub</p></div></div>
+                                </a>
+                            </div>
+                        </div>
+                    </section>
+                `,
+                contact: `
+                    <section id="contact" class="section py-16 sm:py-24">
+                        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                            <div class="max-w-3xl mx-auto text-center">
+                                <h2 class="text-3xl sm:text-4xl font-bold animated">Let’s Build Something Amazing Together 🚀</h2>
+                                <p class="mt-4 text-lg leading-relaxed animated" style="animation-delay: 0.2s;">
+                                    Whether you have an idea, a project in mind, or just want to say hello — I’d love to hear from you. Let’s connect and make it happen!
+                                </p>
+                                <div class="mt-12 bg-[var(--card-light)] p-8 rounded-2xl shadow-sm border border-[var(--border-light)] text-left animated" style="animation-delay: 0.4s;">
+                                    <div class="mb-6">
+                                        <a href="mailto:girishlade111@gmail.com" class="text-lg flex items-center gap-3 hover:text-[var(--primary-color)] transition-colors">
+                                            📩 <span class="font-semibold">Email:</span> girishlade111@gmail.com
+                                        </a>
+                                    </div>
+                                    <hr class="my-6 border-[var(--border-light)]">
+                                    <div>
+                                        <h3 class="text-lg font-semibold mb-4">Find Me On:</h3>
+                                        <div class="space-y-4">
+                                            <a href="https://instagram.com/girish_lade_" target="_blank" class="flex items-center gap-3 hover:text-[var(--primary-color)] transition-colors">
+                                                📷 <span class="font-medium">Instagram</span> &rarr; instagram.com/girish_lade_
+                                            </a>
+                                            <a href="https://linkedin.com/in/girish-lade-075bba201" target="_blank" class="flex items-center gap-3 hover:text-[var(--primary-color)] transition-colors">
+                                                💼 <span class="font-medium">LinkedIn</span> &rarr; linkedin.com/in/girish-lade-075bba201
+                                            </a>
+                                            <a href="https://github.com/girishlade111" target="_blank" class="flex items-center gap-3 hover:text-[var(--primary-color)] transition-colors">
+                                                🐙 <span class="font-medium">GitHub</span> &rarr; github.com/girishlade111
+                                            </a>
+                                            <a href="https://codepen.io/Girish-Lade-the-looper" target="_blank" class="flex items-center gap-3 hover:text-[var(--primary-color)] transition-colors">
+                                                🖋️ <span class="font-medium">CodePen</span> &rarr; codepen.io/Girish-Lade-the-looper
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <p class="mt-12 text-lg leading-relaxed animated" style="animation-delay: 0.6s;">
+                                    I’m always open to discussing new projects, creative ideas, and opportunities to collaborate. Drop me a message and I’ll get back to you as soon as possible.
+                                </p>
+                            </div>
+                        </div>
+                    </section>
+                `
+            };
+            
+            mainContent.innerHTML = Object.values(pages).join('');
+
+            // --- Theme Toggle ---
+            const themeToggleBtn = document.getElementById('theme-toggle');
+            const darkIcon = document.getElementById('theme-toggle-dark-icon');
+            const lightIcon = document.getElementById('theme-toggle-light-icon');
+
+            if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+                lightIcon.classList.remove('hidden');
+            } else {
+                document.documentElement.classList.remove('dark');
+                darkIcon.classList.remove('hidden');
+            }
+
+            themeToggleBtn.addEventListener('click', function() {
+                darkIcon.classList.toggle('hidden');
+                lightIcon.classList.toggle('hidden');
+                if (localStorage.getItem('color-theme')) {
+                    if (localStorage.getItem('color-theme') === 'light') {
+                        document.documentElement.classList.add('dark');
+                        localStorage.setItem('color-theme', 'dark');
+                    } else {
+                        document.documentElement.classList.remove('dark');
+                        localStorage.setItem('color-theme', 'light');
+                    }
+                } else {
+                    if (document.documentElement.classList.contains('dark')) {
+                        document.documentElement.classList.remove('dark');
+                        localStorage.setItem('color-theme', 'light');
+                    } else {
+                        document.documentElement.classList.add('dark');
+                        localStorage.setItem('color-theme', 'dark');
+                    }
+                }
+            });
+
+            // --- Scroll to Top Button ---
+            const scrollToTopBtn = document.getElementById('scrollToTopBtn');
+            window.onscroll = function() {
+                if (document.body.scrollTop > 100 || document.documentElement.scrollTop > 100) {
+                    scrollToTopBtn.classList.add('show');
+                } else {
+                    scrollToTopBtn.classList.remove('show');
+                }
+            };
+            scrollToTopBtn.addEventListener('click', () => {
+                window.scrollTo({top: 0, behavior: 'smooth'});
+            });
+
+            const preloader = document.getElementById('preloader');
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const pageLinks = document.querySelectorAll('.page-link');
+            const sections = document.querySelectorAll('.section');
+            const navLinks = document.querySelectorAll('.nav-link');
+            const header = document.getElementById('header');
+            
+            window.addEventListener('load', () => {
+                preloader.style.opacity = '0';
+                setTimeout(() => {
+                    preloader.style.display = 'none';
+                    document.querySelectorAll('#home .animated').forEach(el => el.classList.add('visible'));
+                }, 500);
+            });
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) entry.target.classList.add('visible');
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('.animated').forEach(el => observer.observe(el));
+
+            window.addEventListener('scroll', () => {
+                header.classList.toggle('scrolled', window.scrollY > 50);
+            });
+
+            mobileMenuButton.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
+
+            function showPage(pageId) {
+                sections.forEach(section => section.classList.remove('active'));
+                const targetSection = document.getElementById(pageId);
+                if (targetSection) targetSection.classList.add('active');
+                
+                navLinks.forEach(link => {
+                    link.classList.toggle('active', link.getAttribute('href') === `#${pageId}`);
+                });
+
+                mobileMenu.classList.add('hidden');
+                if (pageId !== 'home') window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+
+            pageLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const pageId = link.getAttribute('href').substring(1);
+                    showPage(pageId);
+                    history.pushState(null, null, `#${pageId}`);
+                });
+            });
+            
+            const initialPage = window.location.hash.substring(1) || 'home';
+            showPage(initialPage);
+
+            window.addEventListener('popstate', () => {
+                const pageId = window.location.hash.substring(1) || 'home';
+                showPage(pageId);
+            });
+        });
+    </script>
+
+</body>
+</html>
